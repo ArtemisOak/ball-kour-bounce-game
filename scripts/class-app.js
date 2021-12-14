@@ -123,7 +123,7 @@ class Game {
 		this.wireUpListeners();
 
 		this.bgImage = new Image();
-		this.bgImage.src = "/images/city_side_scroller.png";
+		this.bgImage.src = "/images/waves_glow.png";
 
 		// w / 600 = 2048 / 1152
 
@@ -187,14 +187,14 @@ class Game {
 			this.imageHeight
 		);
 
-		ctx.fillStyle = "hsla(300, 100%, 30%, 0.2)";
+		ctx.fillStyle = "hsla(120, 100%, 50%, 0.2)";
 		ctx.fillRect(0, 0, canvas.width, canvas.height);
 		ctx.restore();
 
 		ctx.save();
 		ctx.fillStyle = "pink";
 		ctx.strokeStyle = "purple";
-		ctx.font = "120px trebuchet ms";
+		ctx.font = "90px fantasy";
 
 		ctx.fillText(`${this.score}`, this.scoreX, this.scoreY);
 		ctx.strokeText(`${this.score}`, this.scoreX, this.scoreY);
@@ -252,7 +252,7 @@ class Tracer {
 	render() {
 		ctx.save();
 
-		ctx.fillStyle = `hsla(248, 100%, 21%, ${this.opacity})`;
+		ctx.fillStyle = `hsla(0, 0%, 50%, ${this.opacity})`;
 		ctx.beginPath();
 		ctx.arc(this.x, this.y, this.p.radius / 2, 0, Math.PI * 2, true);
 		ctx.fill();
@@ -281,13 +281,12 @@ class SafePlatform {
 	 */
 	update(elapsedTime) {
 		this.x -= this.game.speed;
-		this.isVisible = this.x + this.width > 0 && this.x < canvas.width;
+		this.isVisible = this.x + this.width > 0;
 	}
 
 	render() {
-		if (!this.isVisible) return;
 		ctx.save();
-		ctx.fillStyle = "hsla(49, 100%, 28%, 1)";
+		ctx.fillStyle = "hsla(0, 0%, 20%, 1)";
 		ctx.fillRect(this.x, this.y, this.width, this.height);
 		ctx.restore();
 	}
@@ -316,13 +315,12 @@ class ScorePlatform {
 	 */
 	update(elapsedTime) {
 		this.x -= this.game.speed;
-		this.isVisible = this.x + this.width > 0 && this.x < canvas.width;
+		this.isVisible = this.x + this.width > 0;
 	}
 
 	render() {
-		if (!this.isVisible) return;
 		ctx.save();
-		ctx.fillStyle = "hsla(294, 100%, 82%, 1)";
+		ctx.fillStyle = "hsla(120, 100%, 50%, 1)";
 		ctx.fillRect(this.x, this.y, this.width, this.height);
 		ctx.restore();
 	}
@@ -361,8 +359,15 @@ class PlatformManager {
 let kb = new KeyboardState();
 let game = new Game(kb);
 
-let platforms = [new SafePlatform(game)];
-let pm = new PlatformManager(platforms, game);
+let p1 = new ScorePlatform(game);
+let p2 = new ScorePlatform(game);
+let p3 = new ScorePlatform(game);
+
+p1.x = 400 + 50;
+p2.x = p1.x + 100;
+p3.x = p2.x + 100;
+
+let platforms = [new SafePlatform(game), p1, p2, p3];
 let player = new Player(platforms);
 let tracers = [new Tracer(player, game)];
 
@@ -376,8 +381,6 @@ function gameLoop(timestamp) {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 	tracers.push(new Tracer(player, game));
-
-	pm.update();
 	let gameObjects = [game, ...tracers, player, ...platforms];
 
 	gameObjects.forEach((o) => {
